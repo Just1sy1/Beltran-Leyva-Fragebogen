@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Beltrán-Leyva-Kartell</title>
+  <style>
+    body {
+      background-color: #111;
+      color: #eee;
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .logo {
+      max-width: 300px;
+      margin: 2rem auto;
+    }
+
+    .btn {
+      background-color: #900;
+      border: none;
+      color: white;
+      padding: 1rem 2rem;
+      font-size: 1.2rem;
+      cursor: pointer;
+      margin-top: 1rem;
+    }
+
+    .btn:hover {
+      background-color: #600;
+    }
+
+    .question {
+      margin: 2rem 0;
+    }
+
+    input[type="text"] {
+      padding: 0.5rem;
+      font-size: 1rem;
+      width: 80%;
+      max-width: 400px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .correct {
+      color: #0f0;
+    }
+
+    .wrong {
+      color: #f00;
+    }
+
+    select, textarea {
+      font-size: 1rem;
+      width: 80%;
+      padding: 0.5rem;
+      max-width: 500px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <img src="logo.png" class="logo" alt="Beltrán-Leyva Logo" />
+    <div id="startScreen">
+      <h1>Willkommen beim Beltrán-Leyva-Kartell</h1>
+      <p>„Du willst Teil des Beltrán-Leyva-Kartells werden? Nur die Stärksten, Klügsten und Loyalsten kommen rein. Beweise dich. Beantworte die 10 Fragen korrekt – sonst brauchst du’s gar nicht erst versuchen.“</p>
+      <button class="btn" onclick="startQuiz()">Ich bin bereit</button>
+    </div>
+
+    <div id="quizScreen" class="hidden">
+      <form id="quizForm"></form>
+      <button class="btn" onclick="checkAnswers()">Absenden</button>
+    </div>
+
+    <div id="resultScreen" class="hidden"></div>
+  </div>
+
+  <script>
+    const questions = [
+      {
+        question: "Was ist das Wichtigste in einem Kartell?",
+        options: ["Geld", "Macht", "Loyalität", "Respekt"],
+        correct: 2
+      },
+      {
+        question: "Wie muss ich gekleidet sein?",
+        options: ["Wie ich will", "Nach vorgegebener Kleidung", "In Jogginghose", "Schick"],
+        correct: 1
+      },
+      {
+        question: "Was ist Pflicht?",
+        options: ["Funk", "GPS", "GPS, Funk", "Waffen"],
+        correct: 2
+      },
+      {
+        question: "Wie verhalte ich mich gegenüber anderen Familien?",
+        options: ["Aggressiv", "Neutral", "Freundlich", "Respektvoll, Kein unnötigen Stress anfangen"],
+        correct: 3
+      },
+      {
+        question: "Auf wen musst du hören?",
+        options: ["Mich selbst", "Auf hochrangigen", "Freunde", "Polizei"],
+        correct: 1
+      },
+      {
+        question: "Was passiert, wenn man sich nicht an Regeln hält?",
+        options: ["Nichts", "Belohnung", "Sanktion", "Verwarnung"],
+        correct: 2
+      },
+      {
+        question: "Was erwartet das Kartell von neuen Mitgliedern?",
+        options: ["Treue", "Geld", "Loyalität", "Fame"],
+        correct: 0
+      },
+      {
+        question: "Was passiert mit einem Verräter im Kartell?",
+        options: ["Nichts", "Bloodout", "Rauswurf", "Gnade"],
+        correct: 1
+      },
+      {
+        question: "Sage mir 2 Stärken und 2 Schwächen:",
+        type: "text"
+      },
+      {
+        question: "Warum genau wir? Warum keine andere Familie?",
+        type: "text"
+      }
+    ];
+
+    function startQuiz() {
+      document.getElementById("startScreen").classList.add("hidden");
+      const form = document.getElementById("quizForm");
+      form.innerHTML = "";
+
+      questions.forEach((q, idx) => {
+        const div = document.createElement("div");
+        div.className = "question";
+        const label = document.createElement("label");
+        label.innerHTML = `<strong>${idx + 1}. ${q.question}</strong><br><br>`;
+
+        div.appendChild(label);
+
+        if (q.type === "text") {
+          const textarea = document.createElement("textarea");
+          textarea.name = "q" + idx;
+          div.appendChild(textarea);
+        } else {
+          q.options.forEach((opt, i) => {
+            const radio = document.createElement("input");
+            radio.type = "radio";
+            radio.name = "q" + idx;
+            radio.value = i;
+            div.appendChild(radio);
+            div.append(" " + opt + " ");
+            div.appendChild(document.createElement("br"));
+          });
+        }
+
+        form.appendChild(div);
+      });
+
+      document.getElementById("quizScreen").classList.remove("hidden");
+    }
+
+    function checkAnswers() {
+      const form = document.forms["quizForm"];
+      let wrong = 0;
+
+      questions.forEach((q, i) => {
+        if (q.type === "text") {
+          const answer = form["q" + i].value.trim();
+          if (!answer) wrong++;
+        } else {
+          const selected = form["q" + i].value;
+          if (parseInt(selected) !== q.correct) wrong++;
+        }
+      });
+
+      document.getElementById("quizScreen").classList.add("hidden");
+      const result = document.getElementById("resultScreen");
+      result.classList.remove("hidden");
+
+      if (wrong <= 3) {
+        result.innerHTML = `
+          <h2 class="correct">Respekt. Du hast das Zeug zum Soldado.</h2>
+          <p>Gib deinen Discord-Namen an – wir melden uns.</p>
+          <input type="text" placeholder="Discord-Name eingeben..." />
+          <br><br>
+          <button class="btn" onclick="alert('Wir melden uns.')">Absenden</button>
+        `;
+      } else {
+        result.innerHTML = `
+          <h2 class="wrong">Nicht gut genug.</h2>
+          <p>Versuch es erneut – vielleicht bist du morgen bereit.</p>
+          <button class="btn" onclick="location.reload()">Erneut versuchen</button>
+        `;
+      }
+    }
+  </script>
+</body>
+</html>
